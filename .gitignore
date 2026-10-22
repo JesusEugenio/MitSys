@@ -1,0 +1,43 @@
+
+# ==== env ==== #
+.env
+
+# ==== idea ==== #
+.idea
+
+# ==== vscode ==== #
+.vs
+
+# ==== ejecutables ==== #
+*.exe
+*exe~
+*.test
+*.out
+*.http
+init
+
+# ==== carpetas ==== #
+/vendor/
+bin/
+/tmp
+
+# ==== configuraciones ==== #
+.air.toml
+
+# ==== crush ==== #
+logs/
+logs/crush.log
+.crush
+crush.db
+
+# === sqls === #
+.sqls.yml
+
+# === helix === #
+.helix/
+
+# === node === #
+node_modules/
+package.json
+package-lock.json
+postgres-language-server.jsonc
