@@ -1,0 +1,16 @@
+{{ define "content" }}
+
+<form hx-post="/inventory/new" >
+    <label for="cut_name">Nombre del corte:</label>
+    <input type="text" id="cut_name" name="cut_name" required>
+
+    <label for="price_per_kilo">Precio por kilo:</label>
+    <input type="text" id="price_per_kilo" name="price_per_kilo" required>
+
+    <label for="available_stock">Stock disponlible:</label>
+    <input type="text" id="available_stock" name="available_stock" required>
+
+    <button type="submit">Crear Producto</button>
+</form>
+
+{{ end }}
