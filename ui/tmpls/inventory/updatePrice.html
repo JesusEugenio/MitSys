@@ -1,0 +1,17 @@
+{{ define "content" }}
+
+<h2>Actualizar Precio de Corte</h2>
+
+<form hx-post="/inventory/update-price" hx-target="#result-message">
+    <label for="product_id">ID del Producto:</label>
+    <input type="number" id="product_id" name="product_id" min="1" required>
+
+    <label for="price_per_kilo">Nuevo Precio por Kilo ($):</label>
+    <input type="number" id="price_per_kilo" name="price_per_kilo" step="0.01" min="0.01" required>
+
+    <button type="submit">Actualizar Precio</button>
+</form>
+
+<div id="result-message"></div>
+
+{{ end }}
