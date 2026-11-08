@@ -3,9 +3,11 @@ module github.com/JesusEugenio/MitSys
 go 1.27.2
 
 require (
+	github.com/go-chi/chi/v5 v5.5.0
 	github.com/jackc/pgx/v5 v5.11.0
 	github.com/joho/godotenv v1.5.1
 	github.com/pressly/goose/v3 v3.29.0
+	github.com/shopspring/decimal v1.6.0
 )
 
 require (
