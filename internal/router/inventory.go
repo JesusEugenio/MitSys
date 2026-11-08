@@ -12,5 +12,10 @@ func (s *Server) inventoryRoutes() chi.Router {
 		r.Get("/", s.inventoryHandler.CreateProductForm)
 	})
 
+	r.Route("/update-price", func(r chi.Router) {
+		r.Get("/", s.inventoryHandler.UpdateProductPriceForm)
+		r.Patch("/", s.inventoryHandler.UpdateProductPrice)
+	})
+
 	return r
 }
