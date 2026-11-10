@@ -1,0 +1,48 @@
+{{ define "content" }}
+
+<h2>Catálogo de Productos</h2>
+
+<div>
+    <label for="search">Buscar corte (ID o Nombre):</label>
+    <input type="search" 
+           id="search" 
+           name="search" 
+           placeholder="Ej. 1 o Arrachera..."
+           hx-get="/inventory/catalog"
+           hx-trigger="input changed delay:300ms, search"
+           hx-target="#catalog-table"
+           hx-select="#catalog-table"
+           hx-swap="outerHTML">
+</div>
+
+<br>
+
+<table id="catalog-table" border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre del Corte</th>
+            <th>Precio por Kilo ($)</th>
+            <th>Stock Disponible (kg)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range . }}
+        <tr {{ if .AvaibleStock.IsZero }}style="color: red;"{{ end }}>
+            <td>{{ .ID }}</td>
+            <td>{{ .CutName }}</td>
+            <td>${{ .PricePerKilo }}</td>
+            <td>
+                {{ .AvaibleStock }}
+                {{ if .AvaibleStock.IsZero }} (Agotado){{ end }}
+            </td>
+        </tr>
+        {{ else }}
+        <tr>
+            <td colspan="4">No se encontraron productos registrados.</td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>
+
+{{ end }}
