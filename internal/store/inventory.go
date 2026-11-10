@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/JesusEugenio/MitSys/internal/models"
 	"github.com/shopspring/decimal"
@@ -11,6 +12,7 @@ import (
 type InvetoryStore interface {
 	CreateProduct(ctx context.Context, p models.Product) (int, error)
 	UpdateProductPrice(ctx context.Context, id int, newPrice decimal.Decimal) error
+	SearchProducts(ctx context.Context, search string) ([]models.Product, error)
 }
 
 type inventoryStore struct {
@@ -49,4 +51,43 @@ func (s *inventoryStore) UpdateProductPrice(ctx context.Context, id int, newPric
 	}
 
 	return nil
+}
+
+func (s *inventoryStore) SearchProducts(ctx context.Context, search string) ([]models.Product, error) {
+	query := `SELECT id, cut_name, price_per_kilo, available_stock, is_active FROM products WHERE is_active = TRUE`
+	var args []any
+
+	if search != "" {
+		if id, err := strconv.Atoi(search); err == nil {
+			query += ` AND (cut_name ILIKE $1 OR id = $2)`
+			args = append(args, "%"+search+"%", id)
+		} else {
+			query += ` AND cut_name ILIKE $1`
+			args = append(args, "%"+search+"%")
+		}
+	}
+
+	query += ` ORDER BY id ASC`
+
+	rows, err := s.db.Query(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("error querying products: %w", err)
+	}
+	defer rows.Close()
+
+	var products []models.Product
+	for rows.Next() {
+		var p models.Product
+		err := rows.Scan(&p.ID, &p.CutName, &p.PricePerKilo, &p.AvaibleStock, &p.IsActive)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning product row: %w", err)
+		}
+		products = append(products, p)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating product rows: %w", err)
+	}
+
+	return products, nil
 }
