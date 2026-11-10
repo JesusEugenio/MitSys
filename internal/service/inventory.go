@@ -12,6 +12,7 @@ import (
 type InventoryService interface {
 	CreateProduct(ctx context.Context, p models.Product) (int, error)
 	UpdateProductPrice(ctx context.Context, id int, newPrice decimal.Decimal) error
+	SearchProducts(ctx context.Context, search string) ([]models.Product, error)
 }
 
 type inventoryService struct {
@@ -44,4 +45,13 @@ func (s inventoryService) UpdateProductPrice(ctx context.Context, id int, newPri
 	}
 
 	return nil
+}
+
+func (s inventoryService) SearchProducts(ctx context.Context, search string) ([]models.Product, error) {
+	products, err := s.InventoryStore.SearchProducts(ctx, search)
+	if err != nil {
+		return nil, fmt.Errorf("error searching products in datastore: %w", err)
+	}
+
+	return products, nil
 }
