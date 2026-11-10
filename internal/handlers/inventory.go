@@ -132,3 +132,15 @@ func (h *InventoryHandler) UpdateProductPrice(w http.ResponseWriter, r *http.Req
 func (h *InventoryHandler) UpdateProductPriceForm(w http.ResponseWriter, r *http.Request) {
 	h.Tmpl.Render(w, r, "inventory/updatePrice.html", nil)
 }
+
+func (h *InventoryHandler) GetCatalog(w http.ResponseWriter, r *http.Request) {
+	search := strings.TrimSpace(r.URL.Query().Get("search"))
+
+	products, err := h.Service.SearchProducts(r.Context(), search)
+	if err != nil {
+		http.Error(w, "error al consultar el catálogo de productos", http.StatusInternalServerError)
+		return
+	}
+
+	h.Tmpl.Render(w, r, "inventory/catalog.html", products)
+}
