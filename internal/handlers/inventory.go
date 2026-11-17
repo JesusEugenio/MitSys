@@ -76,7 +76,7 @@ func (h *InventoryHandler) CreateProduct(w http.ResponseWriter, r *http.Request)
 
 	newProduct.CutName = cutName
 	newProduct.PricePerKilo = pricePerKilo
-	newProduct.AvaibleStock = availableStock
+	newProduct.AvailableStock = availableStock
 
 	_, err = h.Service.CreateProduct(r.Context(), newProduct)
 	if err != nil {

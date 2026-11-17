@@ -5,9 +5,9 @@ import (
 )
 
 type Product struct {
-	ID           int
-	CutName      string
-	PricePerKilo decimal.Decimal
-	AvaibleStock decimal.Decimal
-	IsActive     bool
+	ID             int
+	CutName        string
+	PricePerKilo   decimal.Decimal
+	AvailableStock decimal.Decimal
+	IsActive       bool
 }

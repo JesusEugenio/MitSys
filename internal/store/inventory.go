@@ -30,7 +30,7 @@ func (s *inventoryStore) CreateProduct(ctx context.Context, p models.Product) (i
 
 	query := `INSERT INTO products (cut_name, price_per_kilo, available_stock) VALUES ($1, $2, $3) RETURNING id`
 
-	err := s.db.QueryRow(ctx, query, p.CutName, p.PricePerKilo, p.AvaibleStock).Scan(&id)
+	err := s.db.QueryRow(ctx, query, p.CutName, p.PricePerKilo, p.AvailableStock).Scan(&id)
 	if err != nil {
 		return -1, fmt.Errorf("error creating a new product: %w", err)
 	}
@@ -78,7 +78,7 @@ func (s *inventoryStore) SearchProducts(ctx context.Context, search string) ([]m
 	var products []models.Product
 	for rows.Next() {
 		var p models.Product
-		err := rows.Scan(&p.ID, &p.CutName, &p.PricePerKilo, &p.AvaibleStock, &p.IsActive)
+		err := rows.Scan(&p.ID, &p.CutName, &p.PricePerKilo, &p.AvailableStock, &p.IsActive)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning product row: %w", err)
 		}
