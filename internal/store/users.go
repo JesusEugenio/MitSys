@@ -10,7 +10,7 @@ import (
 )
 
 type UsersStore interface {
-	GetUserByEmail(ctx context.Context, email string) (models.User, error)
+	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
 }
 
 type userStore struct {
@@ -21,7 +21,7 @@ func NewUserStore(db DBTX) UsersStore {
 	return &userStore{db: db}
 }
 
-func (s *userStore) GetUserByEmail(ctx context.Context, email string) (models.User, error) {
+func (s *userStore) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	var user models.User
 
 	query := `SELECT id, email, full_name, password, is_admin, is_cashier, is_delivery FROM users WHERE email = $1`
@@ -29,11 +29,11 @@ func (s *userStore) GetUserByEmail(ctx context.Context, email string) (models.Us
 	if err != nil {
 
 		if errors.Is(err, pgx.ErrNoRows) {
-			return user, fmt.Errorf("error getting user by email, not found: %w", err)
+			return nil, fmt.Errorf("error getting user by email, not found: %w", err)
 		}
 
-		return user, fmt.Errorf("error getting user by email: %w", err)
+		return nil, fmt.Errorf("error getting user by email: %w", err)
 	}
 
-	return user, nil
+	return &user, nil
 }
