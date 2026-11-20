@@ -27,7 +27,7 @@ func Start(ctx context.Context, dbURL string) (*pgxpool.Pool, error) {
 		return nil, fmt.Errorf("error pinging postgres pool: %w", err)
 	}
 
-	if err = migrate(ctx, pool); err != nil {
+	if err = Migrate(ctx, pool); err != nil {
 		return nil, err
 	}
 
@@ -35,7 +35,7 @@ func Start(ctx context.Context, dbURL string) (*pgxpool.Pool, error) {
 	return pool, nil
 }
 
-func migrate(ctx context.Context, pool *pgxpool.Pool) error {
+func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 	db := stdlib.OpenDBFromPool(pool)
 	defer func() {
 		if err := db.Close(); err != nil {
