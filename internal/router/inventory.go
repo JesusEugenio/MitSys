@@ -21,5 +21,9 @@ func (s *Server) inventoryRoutes() chi.Router {
 		r.Get("/", s.inventoryHandler.GetCatalog)
 	})
 
+	r.Route("/{id}", func(r chi.Router) {
+		r.Get("/", s.inventoryHandler.ViewProduct)
+	})
+
 	return r
 }

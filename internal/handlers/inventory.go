@@ -9,6 +9,7 @@ import (
 	"github.com/JesusEugenio/MitSys/internal/models"
 	"github.com/JesusEugenio/MitSys/internal/service"
 	"github.com/JesusEugenio/MitSys/internal/tmpls"
+	"github.com/go-chi/chi/v5"
 	"github.com/shopspring/decimal"
 )
 
@@ -143,4 +144,26 @@ func (h *InventoryHandler) GetCatalog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.Tmpl.Render(w, r, "inventory/catalog.html", products)
+}
+
+func (h *InventoryHandler) ViewProduct(w http.ResponseWriter, r *http.Request) {
+	idParam := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		http.Error(w, "invalid product id", http.StatusBadRequest)
+		return
+	}
+
+	product, err := h.Service.ViewProduct(r.Context(), id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = h.Tmpl.Render(w, r, "inventory/viewProduct.html", product)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 }

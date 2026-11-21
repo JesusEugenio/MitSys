@@ -2,6 +2,8 @@ package store
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -13,6 +15,7 @@ type InvetoryStore interface {
 	CreateProduct(ctx context.Context, p models.Product) (int, error)
 	UpdateProductPrice(ctx context.Context, id int, newPrice decimal.Decimal) error
 	SearchProducts(ctx context.Context, search string) ([]models.Product, error)
+	ViewProduct(ctx context.Context, id int) (models.Product, error)
 }
 
 type inventoryStore struct {
@@ -90,4 +93,26 @@ func (s *inventoryStore) SearchProducts(ctx context.Context, search string) ([]m
 	}
 
 	return products, nil
+}
+
+func (s *inventoryStore) ViewProduct(ctx context.Context, id int) (models.Product, error) {
+	query := `SELECT id, cut_name, price_per_kilo, available_stock, is_active FROM products WHERE  id = $1 AND is_active = TRUE`
+
+	var p models.Product
+	err := s.db.QueryRow(ctx, query, id).Scan(
+		&p.ID,
+		&p.CutName,
+		&p.PricePerKilo,
+		&p.AvailableStock,
+		&p.IsActive,
+	)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.Product{}, fmt.Errorf("product not found")
+		}
+		return models.Product{}, fmt.Errorf("error searching for the product: %w", err)
+	}
+
+	return p, nil
 }

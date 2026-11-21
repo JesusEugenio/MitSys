@@ -13,6 +13,7 @@ type InventoryService interface {
 	CreateProduct(ctx context.Context, p models.Product) (int, error)
 	UpdateProductPrice(ctx context.Context, id int, newPrice decimal.Decimal) error
 	SearchProducts(ctx context.Context, search string) ([]models.Product, error)
+	ViewProduct(ctx context.Context, id int) (models.Product, error)
 }
 
 type inventoryService struct {
@@ -54,4 +55,13 @@ func (s inventoryService) SearchProducts(ctx context.Context, search string) ([]
 	}
 
 	return products, nil
+}
+
+func (s inventoryService) ViewProduct(ctx context.Context, id int) (models.Product, error) {
+	product, err := s.InventoryStore.ViewProduct(ctx, id)
+	if err != nil {
+		return models.Product{}, fmt.Errorf("error searching for the product: %w", err)
+	}
+
+	return product, nil
 }
