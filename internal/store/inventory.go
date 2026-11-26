@@ -16,6 +16,7 @@ type InvetoryStore interface {
 	UpdateProductPrice(ctx context.Context, id int, newPrice decimal.Decimal) error
 	SearchProducts(ctx context.Context, search string) ([]models.Product, error)
 	ViewProduct(ctx context.Context, id int) (models.Product, error)
+	UpdateProduct(ctx context.Context, id int, p models.Product) error
 }
 
 type inventoryStore struct {
@@ -115,4 +116,20 @@ func (s *inventoryStore) ViewProduct(ctx context.Context, id int) (models.Produc
 	}
 
 	return p, nil
+}
+
+func (s *inventoryStore) UpdateProduct(ctx context.Context, id int, p models.Product) error {
+	query := `UPDATE products SET cut_name = $1, price_per_kilo = $2, available_stock = $3 WHERE id = $4 AND is_active = TRUE`
+
+	result, err := s.db.Exec(ctx, query, p.CutName, p.PricePerKilo, p.AvailableStock, id)
+
+	if err != nil {
+		return fmt.Errorf("error updating product: %w", err)
+	}
+
+	if result.RowsAffected() == 0 {
+		return fmt.Errorf("product not found")
+	}
+
+	return nil
 }

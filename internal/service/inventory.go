@@ -14,6 +14,7 @@ type InventoryService interface {
 	UpdateProductPrice(ctx context.Context, id int, newPrice decimal.Decimal) error
 	SearchProducts(ctx context.Context, search string) ([]models.Product, error)
 	ViewProduct(ctx context.Context, id int) (models.Product, error)
+	UpdateProduct(ctx context.Context, id int, p models.Product) error
 }
 
 type inventoryService struct {
@@ -64,4 +65,14 @@ func (s inventoryService) ViewProduct(ctx context.Context, id int) (models.Produ
 	}
 
 	return product, nil
+}
+
+func (s inventoryService) UpdateProduct(ctx context.Context, id int, p models.Product) error {
+	err := s.InventoryStore.UpdateProduct(ctx, id, p)
+
+	if err != nil {
+		return fmt.Errorf("error updating product in datastore: %w", err)
+	}
+
+	return nil
 }
