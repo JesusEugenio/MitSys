@@ -9,6 +9,7 @@ import (
 	"github.com/JesusEugenio/MitSys/internal/models"
 	"github.com/JesusEugenio/MitSys/internal/service"
 	"github.com/JesusEugenio/MitSys/internal/tmpls"
+	"github.com/go-chi/chi/v5"
 	"github.com/shopspring/decimal"
 )
 
@@ -143,4 +144,116 @@ func (h *InventoryHandler) GetCatalog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.Tmpl.Render(w, r, "inventory/catalog.html", products)
+}
+
+func (h *InventoryHandler) ViewProduct(w http.ResponseWriter, r *http.Request) {
+	idParam := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		http.Error(w, "invalid product id", http.StatusBadRequest)
+		return
+	}
+
+	product, err := h.Service.ViewProduct(r.Context(), id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = h.Tmpl.Render(w, r, "inventory/viewProduct.html", product)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (h *InventoryHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
+	var updatedProduct models.Product
+	idParam := chi.URLParam(r, "id")
+
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "error reading the form", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(idParam)
+	if err != nil || id <= 0 {
+		http.Error(w, "invalid ID", http.StatusBadRequest)
+		return
+	}
+
+	cutNameStr := strings.TrimSpace(r.Form.Get("cut_name"))
+	priceStr := strings.TrimSpace(r.Form.Get("price_per_kilo"))
+	stockStr := strings.TrimSpace(r.Form.Get("available_stock"))
+
+	if cutNameStr == "" || priceStr == "" || stockStr == "" {
+		http.Error(w, "all fields are required", http.StatusBadRequest)
+		return
+	}
+
+	if _, err := strconv.Atoi(cutNameStr); err == nil {
+		http.Error(w, "cut name must be a string", http.StatusBadRequest)
+		return
+	}
+
+	if _, err := strconv.ParseFloat(cutNameStr, 64); err == nil {
+		http.Error(w, "cut name must be a string", http.StatusBadRequest)
+		return
+	}
+
+	newPrice, err := decimal.NewFromString(priceStr)
+	if err != nil {
+		http.Error(w, "the price format must be strictly numeric", http.StatusBadRequest)
+		return
+	}
+
+	if newPrice.LessThanOrEqual(decimal.Zero) {
+		http.Error(w, "the price must be strictly greater than zero", http.StatusBadRequest)
+		return
+	}
+
+	newStock, err := decimal.NewFromString(stockStr)
+	if err != nil {
+		http.Error(w, "the available stock format is incorrect", http.StatusBadRequest)
+		return
+	}
+
+	if newStock.LessThan(decimal.Zero) {
+		http.Error(w, "the available stock can not be negative", http.StatusBadRequest)
+		return
+	}
+
+	updatedProduct.CutName = cutNameStr
+	updatedProduct.PricePerKilo = newPrice
+	updatedProduct.AvailableStock = newStock
+
+	err = h.Service.UpdateProduct(r.Context(), id, updatedProduct)
+
+	if err != nil {
+		http.Error(w, "error updating a product", http.StatusBadRequest)
+		return
+	}
+}
+
+func (h *InventoryHandler) UpdateProductForm(w http.ResponseWriter, r *http.Request) {
+	idParam := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil || id <= 0 {
+		http.Error(w, "invalid product ID", http.StatusBadRequest)
+		return
+	}
+
+	product, err := h.Service.ViewProduct(r.Context(), id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = h.Tmpl.Render(w, r, "inventory/updateProduct.html", product)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }

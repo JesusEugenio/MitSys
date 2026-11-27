@@ -1,0 +1,18 @@
+{{ define "content" }}
+
+<form hx-put="/inventory/update/{{ .ID }}">
+    <label for="cut_name">Nombre del corte: </label>
+    <input type="text" id="cut_name" name="cut_name" value="{{ .CutName }}" required>
+
+    <label for="price_per_kilo">Precio por kilo: </label>
+    <input type="text" id="price_per_kilo" name="price_per_kilo" value="{{ .PricePerKilo }}" required>
+
+    <label for="available_stock">Stock disponlible: </label>
+    <input type="text" id="available_stock" name="available_stock" value="{{ .AvailableStock }}" required>
+
+    <button type="submit">Actualizar datos</button>
+
+</form>
+
+
+{{ end }}

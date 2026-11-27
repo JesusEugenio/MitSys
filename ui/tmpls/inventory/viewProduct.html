@@ -1,0 +1,31 @@
+{{ define "content" }}
+
+<h2>Informacion del Corte</h2>
+
+<br>
+
+<table id="product-table" border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre del Corte</th>
+            <th>Precio por Kilo</th>
+            <th>Stock Disponible (kg)</th>
+        </tr>
+    </thead>
+    <tBody>
+        <tr {{if .AvailableStock.IsZero }}style="color: red;" {{ end }}>
+            <td>{{ .ID }}</td>
+            <td>{{ .CutName }}</td>
+            <td>{{ .PricePerKilo }}</td>
+            <td>
+                {{ .AvailableStock }}
+                {{ if .AvailableStock.IsZero }} (Agotado) {{ end }}
+            </td>
+        </tr>
+    </tBody>
+</table>
+
+
+
+{{ end }}
